@@ -1,0 +1,33 @@
+{
+	"info": {
+		"_postman_id": "d221b189-32b4-4aef-9ad6-08866968ffdc",
+		"name": "dummy",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "590328"
+	},
+	"item": [
+		{
+			"name": "sports-plab",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://10.168.48.231:8086/signin/param={{betbuilder.csaba}}",
+					"protocol": "http",
+					"host": [
+						"sports-plab",
+						"dev",
+						"irl",
+						"aws",
+						"tipicodev",
+						"de"
+					],
+					"path": [
+						"en"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

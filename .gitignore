@@ -1,0 +1,8 @@
+.vscode/
+hist_out/
+*.hgrm
+generated_code/
+.idea/.DS_Store
+.idea
+__pycache__
+conf/kissc.creds

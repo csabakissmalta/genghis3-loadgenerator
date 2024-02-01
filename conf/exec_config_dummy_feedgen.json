@@ -1,0 +1,41 @@
+{
+    "$schema": "../schema/exec_schema.json",
+    "duration-seconds": 3600,
+    "hdr-histogram-settings": {
+        "base-out-path": "./hist_out/PLAB-1292/",
+        "version-label": "dummy-001"
+    },
+    "influxdb-settings": {
+        "database": "plab-service-tests",
+        "database-host": "http://10.168.48.231:8086",
+        "database-org": "tipico",
+        "database-token": "dV624xIMNyCRpP6PaavW5JsEAWsi_hMtNFjeJJUEIHR1ib7iN66RUiOarpChXEADI0TictzzcFLfTOA5G5gFpQ==",
+        "measurement": "dummy-001"
+    },
+    "nats-connection": {
+        "nats-url": "nats://10.168.48.217:4222",
+        "user-creds-file-path": "conf/kissc.creds",
+        "subscription-type": "pubsub",
+        "subscription": []
+    },
+    "rampup": {
+        "duration-seconds": 0,
+        "rampup-type": "sinusoidal"
+    },
+    "environment": [],
+    "requests": [
+        {
+            "name": "sports-plab",
+            "frequency": 1,
+            "delay-seconds": 0,
+            "follow-redirects": false,
+            "order-number": 1,
+            "creates-session": false,
+            "uses-session": false,
+            "data-persistence": {
+                "data-in": [],
+                "data-out": []
+            }
+        }
+    ]
+}

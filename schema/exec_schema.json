@@ -1,0 +1,267 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://github.com/csabakissmalta/loadgen-exec-conf-schema.json",
+    "title": "Configuration schema",
+    "description": "Perforamnce test execution configuration schema",
+    "type": "object",
+    "properties": {
+        "hdr-histogram-settings": {
+            "type": "object",
+            "description": "The HDR Histogram output settings.",
+            "properties": {
+                "base-out-path": {
+                    "type": "string",
+                    "description": "The base path, where the files should be saved"
+                },
+                "version-label": {
+                    "type": "string",
+                    "description": "The additional identifier for the set of files from the test. Can be the tesyed version of subject."
+                }
+            },
+            "required": ["base-out-path", "version-label"]
+        },
+        "influxdb-settings": {
+            "type": "object",
+            "description": "Optional settings for influxdb reporting.",
+            "properties": {
+                "database-host": {
+                    "type": "string",
+                    "description": "The database host."
+                },
+                "database-token": {
+                    "type": "string",
+                    "description": "Influxdb2 uses tokens, this is the one to connect to the db."
+                },
+                "database-org": {
+                    "type": "string",
+                    "description": "The organisation set for the database instance."
+                },
+                "database": {
+                    "type": "string",
+                    "description": "The database/bucket name."
+                },
+                "measurement": {
+                    "type": "string",
+                    "description": "Measurement for the test data."
+                }
+            },
+            "required": [
+                "database-host",
+                "database-token",
+                "database-org",
+                "database",
+                "measurement"
+            ]
+        },
+        "duration-seconds": {
+            "type": "integer",
+            "description": "Test duration in seconds",
+            "minimum": 1
+        },
+        "rampup": {
+            "type": "object",
+            "description": "Period, which starts at 0 and reaches the timelines traffic level.",
+            "properties": {
+                "duration-seconds": {
+                    "type": "integer",
+                    "description": "Rampup period duration.",
+                    "minimum": 0
+                },
+                "rampup-type": {
+                    "type": "string",
+                    "oneOf": [
+                        {
+                            "type": "string",
+                            "enum": [
+                                "sinusoidal", "linear"
+                            ]
+                        }
+                    ]
+                }
+            }
+        },
+        "nats-connection": {
+            "type": "object",
+            "description": "Settings, how to connect and subscribe on the NATS server to receive messages as feeds.",
+            "properties": {
+                "nats-url": {
+                    "type": "string",
+                    "description": "The connection to the NATS server (via nats:// protocol, deafult port: 4222)"
+                },
+                "user-creds-file-path": {
+                    "type": "string",
+                    "description": "For authentication on the server, an auth creds file is required."
+                },
+                "subscription-type": {
+                    "type": "string",
+                    "description": "The client can subscribe to a subject or a stream.",
+                    "oneOf": [
+                        {
+                            "type": "string",
+                            "enum": ["pubsub", "stream"]
+                        }
+                    ]
+                },
+                "subscription": {
+                    "type": "array",
+                    "description": "Subject and/or stream names with the correct hierarchy paths.",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "environment": {
+            "type": "array",
+            "description": "Key/value pairs, defined for the test runtime.",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "key": {
+                        "type": "string",
+                        "description": "The env variable name"
+                    },
+                    "value": {
+                        "type": "string",
+                        "description": "The env variable value"
+                    },
+                    "type": {
+                        "type": "string",
+                        "description": "Enum for setting variables for later parsing and composition of the executable http.Request",
+                        "oneOf": [
+                            {
+                                "type": "string",
+                                "enum": ["stringValue", "feedValue", "generatedValue", "sessionValue"]
+                            }
+                        ]
+                    }
+                },
+                "required": ["key", "value"]
+            },
+            "minItems": 0,
+            "uniqueItems": true
+        },
+        "requests": {
+            "type": "array",
+            "description": "The requests and their rate definition corresponding with the Postman collection",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "description": "The request's name from the Postman collection."
+                    },
+                    "frequency": {
+                        "type": "integer",
+                        "description": "Per second execution rate.",
+                        "minimum": 1
+                    },
+                    "follow-redirects": {
+                        "type": "boolean",
+                        "description": "Set the client to follow the redirects or not.",
+                        "default": true
+                    },
+                    "delay-seconds": {
+                        "type": "integer",
+                        "description": "Delayed execution wait time before start - in seconds.",
+                        "minimum": 0
+                    },
+                    "order-number": {
+                        "type": "integer",
+                        "description": "Order number of the request. Can be set for maintaining data dependency."
+                    },
+                    "creates-session": {
+                        "type": "boolean",
+                        "description": "Definition for the request, whether creates session"
+                    },
+                    "uses-session": {
+                        "type": "boolean",
+                        "description": "Definition for the request, whether uses session"
+                    },
+                    "data-persistence": {
+                        "type": "object",
+                        "description": "The wrapper to define sticky data dependency and generation properties.",
+                        "properties": {
+                            "data-in": {
+                                "type": "array",
+                                "description": "Data variable names, what the request is dependant on.",
+                                "items": {
+                                    "type": "object",
+                                    "properties": {
+                                        "name": {
+                                            "type": "string",
+                                            "description": "The name of the data var."
+                                        },
+                                        "storage": {
+                                            "oneOf": [
+                                                {
+                                                    "type": "string",
+                                                    "description": "Where the data load from.",
+                                                    "enum": ["data-store", "session-meta"]
+                                                }
+                                            ]
+                                        },
+                                        "retention": {
+                                            "type": "boolean",
+                                            "description": "Whether the objects need to be disposed after usage.",
+                                            "default": false
+                                        }
+                                    },
+                                    "required": ["name", "storage"]
+                                },
+                                "minItems": 0,
+                                "uniqueItems": true
+                            },
+                            "data-out": {
+                                "type": "array",
+                                "description": "Data variable names, generated/set from the request/response",
+                                "items": {
+                                    "type": "object",
+                                    "description": "The precise definition for the implementation where to find the required value to save.",
+                                    "properties": {
+                                        "target": {
+                                            "oneOf": [
+                                                {
+                                                    "type": "string",
+                                                    "enum": ["header", "body"]
+                                                }
+                                            ]
+                                        },
+                                        "name": {
+                                            "type": "string",
+                                            "description": "The name of the property the value of is required"
+                                        },
+                                        "content-type": {
+                                            "type": "string",
+                                            "description": "Should be set to be able to determine the way to extract the value."
+                                        },
+                                        "storage": {
+                                            "oneOf": [
+                                                {
+                                                    "type": "string",
+                                                    "enum": ["data-store", "session-meta"],
+                                                    "description": "The target, where the data is going to be stored."
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    "required": ["target", "content-type", "storage", "name"]
+                                },
+                                "minItems": 0,
+                                "uniqueItems": true
+                            }
+                        },
+                        "required": []
+                    }
+                },
+                "required": ["name", "frequency", "delay-seconds", "order-number"]
+            },
+            "minItems": 1,
+            "uniqueItems": true
+        }
+    },
+    "required": [
+        "duration-seconds", 
+        "requests"
+    ]
+}
